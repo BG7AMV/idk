@@ -1,0 +1,62 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Decompiler will be improved VERY SOON!
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/wyButjTMhM)
+-- Decompiled on 2025-05-20 17:36:01
+-- Luau version 6, Types version 3
+-- Time taken: 0.001289 seconds
+
+local module_upvr = {}
+module_upvr.__index = module_upvr
+module_upvr.ClassName = "Signal"
+function module_upvr.new() -- Line 15
+	--[[ Upvalues[1]:
+		[1]: module_upvr (readonly)
+	]]
+	local setmetatable_result1 = setmetatable({}, module_upvr)
+	setmetatable_result1._bindableEvent = Instance.new("BindableEvent")
+	setmetatable_result1._argData = nil
+	setmetatable_result1._argCount = nil
+	return setmetatable_result1
+end
+function module_upvr.Fire(arg1, ...) -- Line 29
+	local _bindableEvent = arg1._bindableEvent
+	if not _bindableEvent then
+	else
+		arg1._argData = {...}
+		arg1._argCount = select('#', ...)
+		_bindableEvent:Fire()
+		arg1._argData = nil
+		arg1._argCount = nil
+	end
+end
+function module_upvr.Connect(arg1, arg2) -- Line 44
+	if type(arg2) ~= "function" then
+		error("connect(%s)":format(typeof(arg2)), 2)
+	end
+	return arg1._bindableEvent.Event:Connect(function() -- Line 49
+		--[[ Upvalues[2]:
+			[1]: arg1 (readonly)
+			[2]: arg2 (readonly)
+		]]
+		if not arg1._argData then
+		else
+			arg2(unpack(arg1._argData, 1, arg1._argCount))
+		end
+	end)
+end
+function module_upvr.Wait(arg1) -- Line 57
+	arg1._bindableEvent.Event:Wait()
+	assert(arg1._argData, "Missing arg data, likely due to :TweenSize/Position corrupting threadrefs.")
+	return unpack(arg1._argData, 1, arg1._argCount)
+end
+function module_upvr.Destroy(arg1) -- Line 65
+	if arg1._bindableEvent then
+		arg1._bindableEvent:Destroy()
+		arg1._bindableEvent = nil
+	end
+	arg1._argData = nil
+	arg1._argCount = nil
+end
+module_upvr.connect = module_upvr.Connect
+return module_upvr

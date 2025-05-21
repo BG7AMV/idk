@@ -1,0 +1,52 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Decompiler will be improved VERY SOON!
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/wyButjTMhM)
+-- Decompiled on 2025-05-20 17:37:00
+-- Luau version 6, Types version 3
+-- Time taken: 0.001109 seconds
+
+local var2_upvw = ""
+local Announcement_upvr = script.Parent:WaitForChild("Announcement", math.huge)
+local var4_upvw = false
+local tbl_upvr = {}
+local TweenService_upvr = game:GetService("TweenService")
+game:GetService("ReplicatedStorage"):WaitForChild("GlobalAnnouncement", math.huge).OnClientEvent:Connect(function(arg1) -- Line 9
+	--[[ Upvalues[5]:
+		[1]: var2_upvw (read and write)
+		[2]: Announcement_upvr (readonly)
+		[3]: var4_upvw (read and write)
+		[4]: tbl_upvr (readonly)
+		[5]: TweenService_upvr (readonly)
+	]]
+	local tostring_result1 = tostring(arg1)
+	if 0 < #tostring_result1 then
+		var2_upvw = tostring_result1
+		Announcement_upvr.Text = tostring(tostring_result1)
+		if not var4_upvw then
+			var4_upvw = true
+			for i, v in next, tbl_upvr do
+				v:Cancel()
+				table.remove(tbl_upvr, i)
+			end
+			local any_Create_result1_2 = TweenService_upvr:Create(Announcement_upvr, TweenInfo.new(0.2), {
+				Position = UDim2.new(0.5, 0, 0.131, 0);
+			})
+			any_Create_result1_2:Play()
+			table.insert(tbl_upvr, any_Create_result1_2)
+		end
+		task.wait(8)
+		if var2_upvw == tostring_result1 then
+			var4_upvw = false
+			for i_2, v_2 in next, tbl_upvr do
+				v_2:Cancel()
+				table.remove(tbl_upvr, i_2)
+			end
+			local any_Create_result1 = TweenService_upvr:Create(Announcement_upvr, TweenInfo.new(0.2), {
+				Position = UDim2.new(0.5, 0, -0.5, 0);
+			})
+			any_Create_result1:Play()
+			table.insert(tbl_upvr, any_Create_result1)
+		end
+	end
+end)

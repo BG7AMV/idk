@@ -1,0 +1,161 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Decompiler will be improved VERY SOON!
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/wyButjTMhM)
+-- Decompiled on 2025-05-20 17:36:00
+-- Luau version 6, Types version 3
+-- Time taken: 0.003647 seconds
+
+local Signal_upvr = require(script.Parent.Signal)
+local module_upvr = {}
+function module_upvr.__index(arg1, arg2) -- Line 5
+	--[[ Upvalues[1]:
+		[1]: module_upvr (readonly)
+	]]
+	local var4
+	if var4 == nil then
+		var4 = rawget(arg1, arg2)
+	end
+	if var4 == nil then
+		var4 = rawget(module_upvr, arg2)
+	end
+	return var4
+end
+module_upvr.__metatable = "Effect"
+local tbl_upvr = {"Class", "ID", "Domain"}
+function module_upvr.__tostring(arg1) -- Line 23
+	local Value = arg1.Value
+	if arg1.Disabled then
+		Value = 'X'
+	else
+		Value = "✓"
+	end
+	return string.format("Effect: %s [%s] (%s|%s) [%s]", tostring(arg1.ID), string.upper(arg1.Domain), tostring(arg1.Class), tostring(Value), Value)
+end
+function module_upvr.__newindex(arg1, arg2, arg3) -- Line 27
+	--[[ Upvalues[1]:
+		[1]: tbl_upvr (readonly)
+	]]
+	if table.find(tbl_upvr, arg2) then
+		return error(string.format("Attempt to change %s of effect", arg2))
+	end
+	rawset(arg1._props, arg2, arg3)
+	if rawget(arg1, "Shadow") then
+		arg1.Shadow:Fire(arg2, arg3)
+	end
+end
+local HttpService_upvr = game:GetService("HttpService")
+function module_upvr.new(arg1, arg2, arg3, arg4) -- Line 39
+	--[[ Upvalues[3]:
+		[1]: HttpService_upvr (readonly)
+		[2]: module_upvr (readonly)
+		[3]: Signal_upvr (readonly)
+	]]
+	local tbl = {}
+	local var9
+	if not var9 then
+		if arg3 then
+			var9 = "Server"
+		else
+			var9 = "Client"
+		end
+	end
+	tbl.Domain = var9
+	var9 = arg2.ID
+	if not var9 then
+		var9 = HttpService_upvr:GenerateGUID(false)
+	end
+	tbl.ID = var9
+	var9 = arg2.Class
+	tbl.Class = var9
+	var9 = arg2.Disabled or false
+	tbl.Disabled = var9
+	local function INLINED() -- Internal function, doesn't exist in bytecode
+		var9 = arg2.Value
+		return var9
+	end
+	if arg2.Value == nil or not INLINED() then
+		var9 = "???"
+	end
+	tbl.Value = var9
+	tbl.Parent = arg1
+	var9 = arg2.Tags
+	if not var9 then
+		var9 = {}
+	end
+	tbl.Tags = var9
+	var9 = arg4 or 0
+	tbl.DebrisTime = var9
+	var9 = setmetatable({
+		_props = tbl;
+	}, module_upvr)
+	rawset(var9, "TagAdded", Signal_upvr.new())
+	rawset(var9, "TagRemoving", Signal_upvr.new())
+	rawset(var9, "DebrisChanged", Signal_upvr.new())
+	return var9
+end
+function module_upvr.ParseEffect(arg1) -- Line 60
+	return {
+		Class = arg1.Class;
+		Disabled = arg1.Disabled;
+		Tags = arg1.Tags;
+		Domain = arg1.Domain;
+		ID = arg1.ID;
+		Value = arg1.Value;
+		DebrisTime = arg1.DebrisTime;
+	}
+end
+function module_upvr.Debris(arg1, arg2) -- Line 72
+	arg1.DebrisTime = arg2
+	arg1.DebrisChanged:Fire(arg2)
+	task.delay(arg2, arg1.Destroy, arg1)
+end
+function module_upvr.Connect(arg1, arg2) -- Line 78
+	--[[ Upvalues[1]:
+		[1]: Signal_upvr (readonly)
+	]]
+	if not arg1.Shadow then
+		rawset(arg1, "Shadow", Signal_upvr.new())
+	end
+	return arg1.Shadow:Connect(arg2)
+end
+module_upvr.connect = module_upvr.Connect
+function module_upvr.AddTag(arg1, arg2) -- Line 88
+	arg1.Tags[arg2] = true
+	arg1.TagAdded:Fire(arg2)
+end
+function module_upvr.RemoveTag(arg1, arg2) -- Line 93
+	arg1.Tags[arg2] = nil
+	arg1.TagRemoving:Fire(arg2)
+end
+function module_upvr.HasTag(arg1, arg2) -- Line 98
+	local var12
+	if arg1.Tags[arg2] ~= true then
+		var12 = false
+	else
+		var12 = true
+	end
+	return var12
+end
+function module_upvr.Destroy(arg1) -- Line 102
+	if arg1.Destroyed then
+	else
+		arg1.Destroyed = true
+		if arg1.Parent and arg1.Parent.Effects then
+			arg1.Parent.Effects[arg1.ID] = nil
+			arg1.Parent.EffectRemoving:Fire(arg1)
+		end
+		arg1.TagAdded:Destroy()
+		arg1.TagRemoving:Destroy()
+		arg1.DebrisChanged:Destroy()
+		if arg1.Shadow then
+			arg1.Shadow:Destroy()
+			arg1.Shadow = nil
+		end
+		arg1.TagAdded = nil
+		arg1.TagRemoving = nil
+		arg1.Parent = nil
+	end
+end
+module_upvr.Remove = module_upvr.Destroy
+return module_upvr

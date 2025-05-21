@@ -1,0 +1,527 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Decompiler will be improved VERY SOON!
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/wyButjTMhM)
+-- Decompiled on 2025-05-20 17:36:03
+-- Luau version 6, Types version 3
+-- Time taken: 0.016226 seconds
+
+local CollectionService_upvr = game:GetService("CollectionService")
+if not game:GetService("RunService"):IsClient() then
+	warn("Attempted to initialize SmartBone on Server.")
+	return nil
+end
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local Character_upvw = LocalPlayer.Character
+LocalPlayer.CharacterAdded:Connect(function(arg1) -- Line 76
+	--[[ Upvalues[1]:
+		[1]: Character_upvw (read and write)
+	]]
+	Character_upvw = arg1
+end)
+local Dependencies = script:WaitForChild("Dependencies")
+local Components = script:WaitForChild("Components")
+local SettingsMath_upvr = require(Dependencies.SettingsMath)
+local Utilities_upvr = require(Dependencies.Utilities)
+local Debug_upvr = require(Dependencies.Config).Debug
+if Debug_upvr then
+	local Model_upvw = Instance.new("Model")
+	Model_upvw.Name = "SMARTBONE_DEBUGFOLDER"
+	Model_upvw.Parent = workspace
+	local Highlight = Instance.new("Highlight")
+	Highlight.FillColor = Color3.fromRGB(255, 0, 0)
+	Highlight.OutlineTransparency = 1
+	Highlight.FillTransparency = 0
+	Highlight.Parent = Model_upvw
+	Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+	Highlight.Enabled = true
+end
+local tbl_upvr_2 = {}
+local module_upvr = {}
+module_upvr.__index = module_upvr
+local random_state_upvr = Random.new(12098135901304)
+local UnitConversion_upvr = require(Dependencies.UnitConversion)
+local DefaultSettings_upvr = require(Dependencies.DefaultSettings)
+function module_upvr.new(arg1, arg2) -- Line 130
+	--[[ Upvalues[4]:
+		[1]: random_state_upvr (readonly)
+		[2]: UnitConversion_upvr (readonly)
+		[3]: module_upvr (readonly)
+		[4]: DefaultSettings_upvr (readonly)
+	]]
+	local tbl = {
+		ID = random_state_upvr:NextInteger(1, 10000000);
+	}
+	tbl.RootPart = arg1
+	tbl.Time = 0
+	tbl.ParticleTrees = {}
+	tbl.Connections = {}
+	tbl.RootList = arg2
+	tbl.ObjectScale = UnitConversion_upvr.Convert(math.abs(arg1.Size.X), "Millimeter")
+	tbl.WindPreviousPosition = Vector3.new(0, 0, 0)
+	tbl.Removed = false
+	tbl.RemovedEvent = Instance.new("BindableEvent")
+	tbl.InRange = false
+	tbl.Settings = {}
+	local setmetatable_result1 = setmetatable(tbl, module_upvr)
+	for i, v in DefaultSettings_upvr do
+		setmetatable_result1.Settings[i] = arg1:GetAttribute(i) or v
+	end
+	setmetatable_result1.Settings.BlendWeight = 1
+	setmetatable_result1.Settings.UpdateRate = math.floor(setmetatable_result1.Settings.UpdateRate + 0.1)
+	setmetatable_result1:Init()
+	setmetatable_result1:UpdateParameters(setmetatable_result1.Settings)
+	return setmetatable_result1
+end
+local Lighting_upvr = game:GetService("Lighting")
+function module_upvr.Init(arg1) -- Line 161
+	--[[ Upvalues[2]:
+		[1]: tbl_upvr_2 (readonly)
+		[2]: Lighting_upvr (readonly)
+	]]
+	local RootPart_2_upvr = arg1.RootPart
+	tbl_upvr_2[arg1.ID] = arg1
+	arg1.Connections.AttributeChanged = RootPart_2_upvr.AttributeChanged:ConnectParallel(function(arg1_2) -- Line 168
+		--[[ Upvalues[2]:
+			[1]: arg1 (readonly)
+			[2]: RootPart_2_upvr (readonly)
+		]]
+		if not arg1.Settings[arg1_2] then
+		else
+			arg1:UpdateParameters(arg1_2, RootPart_2_upvr:GetAttribute(arg1_2))
+		end
+	end)
+	arg1.Connections.LightingAttributeChanged = Lighting_upvr.AttributeChanged:ConnectParallel(function(arg1_3) -- Line 173
+		--[[ Upvalues[2]:
+			[1]: arg1 (readonly)
+			[2]: Lighting_upvr (copied, readonly)
+		]]
+		if not arg1.Settings[arg1_3] then
+		else
+			arg1:UpdateParameters(arg1_3, Lighting_upvr:GetAttribute(arg1_3))
+		end
+	end)
+	for _, v_2 in RootPart_2_upvr:GetDescendants() do
+		if v_2:IsA("Bone") and v_2.Parent:IsA("Bone") and #v_2:GetChildren() == 0 then
+			local Bone_2 = Instance.new("Bone")
+			Bone_2.Parent = v_2
+			Bone_2.Name = v_2.Name.."_Tail"
+			Bone_2.WorldCFrame = v_2.WorldCFrame + v_2.WorldCFrame.UpVector.Unit * (v_2.WorldPosition - v_2.Parent.WorldPosition).Magnitude
+		end
+	end
+	for _, v_3 in arg1.RootList do
+		arg1:AppendParticleTree(v_3)
+	end
+	for _, v_4 in arg1.ParticleTrees do
+		arg1:AppendParticles(v_4, v_4.Root, 0, 0)
+	end
+end
+local ParticleTree_upvr = require(Components.ParticleTree)
+function module_upvr.AppendParticleTree(arg1, arg2) -- Line 198
+	--[[ Upvalues[1]:
+		[1]: ParticleTree_upvr (readonly)
+	]]
+	table.insert(arg1.ParticleTrees, ParticleTree_upvr.new(arg2, arg1.RootPart, arg1.Settings.Gravity))
+end
+local Particle_upvr = require(Components.Particle)
+function module_upvr.AppendParticles(arg1, arg2, arg3, arg4, arg5) -- Line 202
+	--[[ Upvalues[5]:
+		[1]: Utilities_upvr (readonly)
+		[2]: Particle_upvr (readonly)
+		[3]: SettingsMath_upvr (readonly)
+		[4]: Debug_upvr (readonly)
+		[5]: Model_upvw (read and write)
+	]]
+	local any_ShallowCopy_result1_upvr = Utilities_upvr.ShallowCopy(arg1.Settings)
+	for i_5, v_5 in any_ShallowCopy_result1_upvr do
+		if arg3:GetAttribute(i_5) then
+			any_ShallowCopy_result1_upvr.Create = true
+			any_ShallowCopy_result1_upvr[i_5] = arg3:GetAttribute(i_5) or v_5
+		end
+	end
+	local any_new_result1_upvr = Particle_upvr.new(arg3, arg2.Root, arg1.RootPart, any_ShallowCopy_result1_upvr)
+	if any_ShallowCopy_result1_upvr.Create then
+		arg1.Connections[arg3] = arg3.AttributeChanged:ConnectParallel(function(arg1_4) -- Line 215
+			--[[ Upvalues[4]:
+				[1]: any_ShallowCopy_result1_upvr (readonly)
+				[2]: arg3 (readonly)
+				[3]: any_new_result1_upvr (readonly)
+				[4]: SettingsMath_upvr (copied, readonly)
+			]]
+			if not any_ShallowCopy_result1_upvr[arg1_4] then
+			else
+				local var45 = any_new_result1_upvr
+				if SettingsMath_upvr[arg1_4] then
+					var45 = SettingsMath_upvr[arg1_4](arg3:GetAttribute(arg1_4))
+				else
+					var45 = arg3:GetAttribute(arg1_4)
+				end
+				var45.Settings[arg1_4] = var45
+			end
+		end)
+	end
+	any_new_result1_upvr.Position = arg3.WorldPosition
+	any_new_result1_upvr.LastPosition = arg3.WorldPosition
+	any_new_result1_upvr.ParentIndex = arg4
+	any_new_result1_upvr.BoneLength = arg5
+	any_new_result1_upvr.HeirarchyLength = 0
+	if Debug_upvr == true then
+		any_new_result1_upvr.DebugPart = Instance.new("Part")
+		any_new_result1_upvr.DebugPart.Size = Vector3.new(0.10000, 0.10000, 0.10000)
+		any_new_result1_upvr.DebugPart.Anchored = true
+		any_new_result1_upvr.DebugPart.CanCollide = false
+		any_new_result1_upvr.DebugPart.CastShadow = false
+		any_new_result1_upvr.DebugPart.CanTouch = false
+		any_new_result1_upvr.DebugPart.CanQuery = false
+		any_new_result1_upvr.DebugPart.Color = Color3.fromRGB(255, 0, 0)
+		any_new_result1_upvr.DebugPart.Parent = Model_upvw
+	end
+	if 1 <= arg4 then
+		local Magnitude = (arg2.Particles[arg4].Bone.WorldPosition - any_new_result1_upvr.Position).Magnitude
+		any_new_result1_upvr.BoneLength = Magnitude
+		any_new_result1_upvr.Weight = Magnitude * 0.7
+		any_new_result1_upvr.HeirarchyLength = Utilities_upvr.GetHierarchyLength(arg3, arg2.Root)
+	end
+	if any_new_result1_upvr.HeirarchyLength <= any_ShallowCopy_result1_upvr.AnchorDepth then
+		any_new_result1_upvr.Anchored = true
+	end
+	table.insert(arg2.Particles, any_new_result1_upvr)
+	local children = arg3:GetChildren()
+	for i_6 = 1, #children do
+		local var48 = children[i_6]
+		if var48:IsA("Bone") then
+			arg1:AppendParticles(arg2, var48, #arg2.Particles, Magnitude)
+		end
+	end
+end
+function module_upvr.UpdateParameters(arg1, arg2, arg3) -- Line 263
+	--[[ Upvalues[1]:
+		[1]: SettingsMath_upvr (readonly)
+	]]
+	local var49
+	if not arg1.Settings[arg2] then
+	else
+		if SettingsMath_upvr[arg2] then
+			var49 = SettingsMath_upvr[arg2](arg3)
+		else
+			var49 = arg3
+		end
+		arg1.Settings[arg2] = var49
+	end
+end
+function module_upvr.PreUpdate(arg1, arg2) -- Line 268
+	local RootPart = arg2.RootPart
+	local Root = arg2.Root
+	arg2.ObjectMove = RootPart.Position - arg2.ObjectPreviousPosition
+	arg2.ObjectPreviousPosition = RootPart.Position
+	arg2.RestGravity = Root.CFrame:PointToWorldSpace(arg2.LocalGravity)
+	for _, v_6 in arg2.Particles do
+		v_6.LastTransformOffset = v_6.TransformOffset
+		if v_6.Bone == v_6.Root then
+			v_6.TransformOffset = RootPart.CFrame * v_6.RootTransform
+		else
+			v_6.TransformOffset = Root.WorldCFrame * v_6.Transform
+		end
+		v_6.LocalTransformOffset = Root.CFrame * v_6.LocalTransform
+	end
+end
+function module_upvr.UpdateParticles(arg1, arg2, arg3, arg4) -- Line 289
+	local Settings_2 = arg1.Settings
+	local Unit = Settings_2.Gravity.Unit
+	local _ = Unit * math.max(arg2.RestGravity:Dot(Unit), 0)
+	local var61
+	local function INLINED() -- Internal function, doesn't exist in bytecode
+		var61 = arg2.ObjectMove
+		return var61
+	end
+	if arg4 ~= 0 or not INLINED() then
+		var61 = Vector3.new(0, 0, 0)
+	end
+	for _, v_7 in arg2.Particles do
+		local var62 = v_7.Settings or Settings_2
+		local var63
+		if v_7.Settings then
+			var63 = var62.Gravity
+			local _ = var62.Gravity.Unit
+			var63 -= _ * math.max(arg2.RestGravity:Dot(_), 0)
+			var63 = (var63 + Settings_2.Force) * (arg1.ObjectScale * arg3)
+		end
+		if 1 <= v_7.ParentIndex and v_7.Anchored == false then
+			local var65 = Vector3.new(0, 0, 0)
+			if 0 < var62.WindInfluence then
+				local _ = (arg2.WindOffset) + (os.clock() - v_7.HeirarchyLength / 5) + (v_7.TransformOffset.Position - arg2.Root.WorldPosition).Magnitude / 5 * var62.WindInfluence
+				var65 = Vector3.new(Settings_2.WindDirection.X + Settings_2.WindDirection.X * math.sin(_ * Settings_2.WindSpeed), Settings_2.WindDirection.Y + math.sin(_ * Settings_2.WindSpeed) * 0.05, Settings_2.WindDirection.Z + Settings_2.WindDirection.X * math.sin(_ * Settings_2.WindSpeed))
+				var65 /= v_7.BoneLength
+				var65 *= var62.WindInfluence
+				var65 *= (Settings_2.WindStrength / 100) * (math.clamp(v_7.HeirarchyLength, 1, 10) / 10)
+				var65 *= v_7.Weight
+				arg1.WindPreviousPosition = var65
+			end
+			local var67 = var61 * var62.Inertia
+			v_7.LastPosition = v_7.Position + var67
+			v_7.Position += (v_7.Position - v_7.LastPosition) * (1 - var62.Damping) + var63 + var67 + var65
+		else
+			v_7.LastPosition = v_7.TransformOffset.Position
+			v_7.Position = v_7.TransformOffset.Position
+		end
+	end
+end
+function module_upvr.CorrectParticles(arg1, arg2, arg3) -- Line 369
+	local Settings_3 = arg1.Settings
+	local Stiffness = Settings_3.Stiffness
+	for _, v_8 in arg2.Particles do
+		local var83 = arg2.Particles[v_8.ParentIndex]
+		if var83 and 1 <= v_8.ParentIndex and v_8.Anchored == false then
+			if 0 < Stiffness or 0 < Settings_3.Elasticity then
+				local Position_2 = (CFrame.new(var83.Position) * var83.TransformOffset.Rotation * CFrame.new(v_8.LocalTransformOffset.Position)).Position
+				v_8.Position += (Position_2 - v_8.Position) * (Settings_3.Elasticity * arg3)
+				if 0 < Stiffness then
+					local var85 = Position_2 - v_8.Position
+					local Magnitude_2 = var85.Magnitude
+					local var87 = (var83.TransformOffset.Position - v_8.TransformOffset.Position).Magnitude * (1 - Stiffness) * 2
+					if var87 < Magnitude_2 then
+						v_8.Position += (var85) * ((Magnitude_2 - var87) / Magnitude_2)
+					end
+				end
+			end
+			local var88 = var83.Position - v_8.Position
+			local Magnitude_3 = var88.Magnitude
+			if 0 < Magnitude_3 then
+				-- KONSTANTERROR: Expression was reused, decompilation is incorrect
+				v_8.Position += (var88) * ((Magnitude_3 - (var83.TransformOffset.Position - v_8.TransformOffset.Position).Magnitude) / Magnitude_3)
+			end
+		end
+	end
+end
+function module_upvr.SkipUpdateParticles(arg1, arg2) -- Line 409
+	-- KONSTANTERROR: [0] 1. Error Block 1 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [0] 1. Error Block 1 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [127] 82. Error Block 11 start (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [127] 82. Error Block 11 end (CF ANALYSIS FAILED)
+	-- KONSTANTERROR: [12] 12. Error Block 17 start (CF ANALYSIS FAILED)
+	-- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [127.15]
+	-- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [127.14]
+	if nil <= nil and not nil then
+		-- KONSTANTERROR: Expression was reused, decompilation is incorrect (x3)
+		if nil < nil and nil < nil then
+		end
+		-- KONSTANTERROR: Expression was reused, decompilation is incorrect
+		if nil < nil then
+			-- KONSTANTWARNING: GOTO [127] #82
+		end
+	else
+	end
+	-- KONSTANTERROR: [12] 12. Error Block 17 end (CF ANALYSIS FAILED)
+end
+function module_upvr.CalculateTransforms(arg1, arg2, arg3) -- Line 447
+	--[[ Upvalues[1]:
+		[1]: Utilities_upvr (readonly)
+	]]
+	if arg1.InRange then
+		for _, v_9 in arg2.Particles do
+			if 1 <= v_9.ParentIndex and v_9.Anchored == false then
+				local var97 = arg2.Particles[v_9.ParentIndex]
+				local Bone = var97.Bone
+				if var97 and Bone and Bone:IsA("Bone") and Bone ~= arg2.Root then
+					local TransformOffset_2 = var97.TransformOffset
+					var97.CalculatedWorldCFrame = Bone.WorldCFrame:Lerp((CFrame.new(var97.Position)) * (Utilities_upvr.GetRotationBetween(TransformOffset_2.UpVector, v_9.Position - var97.Position, TransformOffset_2:PointToObjectSpace(var97.LocalTransformOffset.Position)).Rotation * TransformOffset_2.Rotation), 1 - 0.00001 ^ arg3)
+				end
+			end
+		end
+	end
+end
+function module_upvr.TransformBones(arg1, arg2) -- Line 475
+	if arg1.InRange then
+		for _, v_10 in arg2.Particles do
+			if 1 <= v_10.ParentIndex and v_10.Anchored == false then
+				local var106 = arg2.Particles[v_10.ParentIndex]
+				local Bone_4 = var106.Bone
+				if var106 and Bone_4 and Bone_4:IsA("Bone") and Bone_4 ~= arg2.Root then
+					if var106.Anchored and arg1.Settings.AnchorsRotate == false then
+						Bone_4.WorldCFrame = var106.TransformOffset
+					else
+						Bone_4.WorldCFrame = var106.CalculatedWorldCFrame
+					end
+				end
+			end
+		end
+	end
+end
+function module_upvr.DEBUG(arg1, arg2) -- Line 496
+	for _, v_11 in arg2.Particles do
+		if v_11 then
+			v_11.DebugPart.CFrame = CFrame.new(v_11.Position)
+		end
+	end
+end
+function module_upvr.RunLoop(arg1, arg2, arg3, arg4) -- Line 504
+	local var112 = true
+	local var113 = arg3 * 10
+	if 0 < arg4 then
+		arg1.Time += arg3
+		var112 = false
+		if 1 / arg4 <= arg1.Time then
+			var112 = true
+			arg1.Time = 0
+		end
+	end
+	if var112 then
+		arg1:UpdateParticles(arg2, var113, 0)
+		arg1:CorrectParticles(arg2, var113)
+	else
+		arg1:SkipUpdateParticles(arg2)
+	end
+end
+function module_upvr.ResetParticles(arg1, arg2) -- Line 527
+	for _, v_12 in arg2.Particles do
+		v_12.LastPosition = v_12.TransformOffset.Position
+		v_12.Position = v_12.TransformOffset.Position
+	end
+end
+function module_upvr.ResetTransforms(arg1, arg2) -- Line 534
+	for _, v_13 in arg2.Particles do
+		local var120
+		if v_13.Bone == v_13.Root then
+			var120 = arg2.RootPart.CFrame * v_13.RootTransform
+		else
+			var120 = arg2.Root.WorldCFrame * v_13.Transform
+		end
+		v_13.Bone.WorldCFrame = var120
+	end
+end
+function module_upvr.UpdateBones(arg1, arg2, arg3) -- Line 548
+	for _, v_14 in arg1.ParticleTrees do
+		arg1:PreUpdate(v_14, arg2)
+		arg1:RunLoop(v_14, arg2, arg3)
+		arg1:CalculateTransforms(v_14, arg2)
+	end
+end
+local any_GetTagged_result1_upvr = CollectionService_upvr:GetTagged("SmartBone")
+function module_upvr.Start() -- Line 556
+	--[[ Upvalues[6]:
+		[1]: Debug_upvr (readonly)
+		[2]: Character_upvw (read and write)
+		[3]: Utilities_upvr (readonly)
+		[4]: tbl_upvr_2 (readonly)
+		[5]: CollectionService_upvr (readonly)
+		[6]: any_GetTagged_result1_upvr (readonly)
+	]]
+	local Folder_upvr = Instance.new("Folder")
+	Folder_upvr.Name = "Actors"
+	Folder_upvr.Parent = game.Players.LocalPlayer:WaitForChild("PlayerScripts")
+	local function _(arg1) -- Line 563, Named "DebugPrint"
+		--[[ Upvalues[1]:
+			[1]: Debug_upvr (copied, readonly)
+		]]
+		if Debug_upvr then
+			warn(arg1)
+		end
+	end
+	local tbl_upvr = {}
+	local tbl_2_upvr = {}
+	local function registerSmartBoneObject_upvr(arg1) -- Line 572, Named "registerSmartBoneObject"
+		--[[ Upvalues[6]:
+			[1]: Character_upvw (copied, read and write)
+			[2]: Utilities_upvr (copied, readonly)
+			[3]: Folder_upvr (readonly)
+			[4]: tbl_upvr (readonly)
+			[5]: tbl_2_upvr (readonly)
+			[6]: Debug_upvr (copied, readonly)
+		]]
+		-- KONSTANTERROR: [0] 1. Error Block 27 start (CF ANALYSIS FAILED)
+		if not Character_upvw or not arg1:IsDescendantOf(Character_upvw) then
+		else
+			-- KONSTANTERROR: [0] 1. Error Block 27 end (CF ANALYSIS FAILED)
+			-- KONSTANTERROR: [13] 12. Error Block 6 start (CF ANALYSIS FAILED)
+			-- KONSTANTERROR: [13] 12. Error Block 6 end (CF ANALYSIS FAILED)
+			-- KONSTANTERROR: [21] 19. Error Block 7 start (CF ANALYSIS FAILED)
+			local any_IsAncestorOf_result1 = game.Workspace:IsAncestorOf(arg1)
+			-- KONSTANTERROR: [21] 19. Error Block 7 end (CF ANALYSIS FAILED)
+			-- KONSTANTERROR: [90] 69. Error Block 18 start (CF ANALYSIS FAILED)
+			local Actor_upvr = Instance.new("Actor")
+			local BindableFunction = Instance.new("BindableFunction")
+			BindableFunction.Name = "Event"
+			BindableFunction.Parent = Actor_upvr
+			local clone = script.Dependencies.ActorScript:Clone()
+			clone.Name = "Runtime"
+			clone.Parent = Actor_upvr
+			Actor_upvr.Parent = Folder_upvr
+			clone.Enabled = true
+			tbl_upvr[arg1] = Actor_upvr.Event:Invoke(arg1, any_IsAncestorOf_result1)
+			Actor_upvr.Name = arg1.Name..tbl_upvr[arg1].ID
+			tbl_upvr[arg1].RemovedEvent.Event:Once(function() -- Line 608
+				--[[ Upvalues[1]:
+					[1]: Actor_upvr (readonly)
+				]]
+				Actor_upvr.Runtime.Enabled = false
+				Actor_upvr:Destroy()
+			end)
+			table.insert(tbl_2_upvr, arg1)
+			-- KONSTANTERROR: [90] 69. Error Block 18 end (CF ANALYSIS FAILED)
+			-- KONSTANTERROR: [172] 127. Error Block 23 start (CF ANALYSIS FAILED)
+			Actor_upvr = table.insert
+			Actor_upvr(tbl_2_upvr, arg1)
+			Actor_upvr = "Failed to create SmartBone Object for "..arg1:GetFullName().."! Make sure you have defined the Root Bone(s) for this object!"
+			if Debug_upvr then
+				warn(Actor_upvr)
+			end
+			-- KONSTANTERROR: [172] 127. Error Block 23 end (CF ANALYSIS FAILED)
+			-- KONSTANTERROR: [192] 143. Error Block 22 start (CF ANALYSIS FAILED)
+			-- KONSTANTERROR: [192] 143. Error Block 22 end (CF ANALYSIS FAILED)
+		end
+	end
+	CollectionService_upvr:GetInstanceAddedSignal("SmartBone"):Connect(registerSmartBoneObject_upvr)
+	CollectionService_upvr:GetInstanceRemovedSignal("SmartBone"):Connect(function(arg1) -- Line 626, Named "removeSmartBoneObject"
+		--[[ Upvalues[3]:
+			[1]: tbl_upvr (readonly)
+			[2]: Debug_upvr (copied, readonly)
+			[3]: tbl_upvr_2 (copied, readonly)
+		]]
+		if tbl_upvr[arg1] then
+			if Debug_upvr then
+				warn("Removing SmartBone Object with ID: "..tbl_upvr[arg1].ID)
+			end
+			task.spawn(function() -- Line 629
+				--[[ Upvalues[3]:
+					[1]: tbl_upvr (copied, readonly)
+					[2]: arg1 (readonly)
+					[3]: tbl_upvr_2 (copied, readonly)
+				]]
+				for _, v_15 in pairs(tbl_upvr[arg1].Connections) do
+					v_15:Disconnect()
+				end
+				tbl_upvr[arg1].SimulationConnection:Disconnect()
+				task.wait()
+				tbl_upvr[arg1].RemovedEvent:Destroy()
+				for _, v_16 in ipairs(tbl_upvr[arg1].ParticleTrees) do
+					for _, v_17 in v_16.Particles do
+						for _, v_18 in v_17.RecyclingBin do
+							v_18:Destroy()
+						end
+					end
+				end
+				task.wait()
+				if tbl_upvr_2[tbl_upvr[arg1].ID] then
+					tbl_upvr_2[tbl_upvr[arg1].ID] = nil
+				end
+				tbl_upvr[arg1].Removed = true
+				tbl_upvr[arg1].RemovedEvent:Fire()
+				tbl_upvr[arg1] = nil
+			end)
+		end
+	end)
+	if Character_upvw then
+		for _, v_19_upvr in pairs(any_GetTagged_result1_upvr) do
+			if not tbl_upvr[v_19_upvr] and not table.find(tbl_2_upvr, v_19_upvr) and v_19_upvr:IsDescendantOf(Character_upvw) then
+				task.spawn(function() -- Line 668
+					--[[ Upvalues[2]:
+						[1]: registerSmartBoneObject_upvr (readonly)
+						[2]: v_19_upvr (readonly)
+					]]
+					registerSmartBoneObject_upvr(v_19_upvr)
+				end)
+			end
+		end
+	end
+end
+return module_upvr

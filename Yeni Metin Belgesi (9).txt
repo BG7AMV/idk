@@ -1,0 +1,554 @@
+-- Saved by UniversalSynSaveInstance (Join to Copy Games) https://discord.gg/wx4ThpAsmw
+
+-- Decompiler will be improved VERY SOON!
+-- Decompiled with Konstant V2.1, a fast Luau decompiler made in Luau by plusgiant5 (https://discord.gg/wyButjTMhM)
+-- Decompiled on 2025-05-20 17:37:19
+-- Luau version 6, Types version 3
+-- Time taken: 0.012374 seconds
+
+local Parent_upvr = script.Parent
+local Torso = Parent_upvr:WaitForChild("Torso")
+local Right_Shoulder_upvr = Torso:WaitForChild("Right Shoulder")
+local Left_Shoulder_upvr = Torso:WaitForChild("Left Shoulder")
+local Right_Hip_upvr = Torso:WaitForChild("Right Hip")
+local Left_Hip_upvr = Torso:WaitForChild("Left Hip")
+local Humanoid_upvr = Parent_upvr:WaitForChild("Humanoid")
+local var16_upvw = "Standing"
+local _, _ = pcall(function() -- Line 13
+	return UserSettings():IsUserFeatureEnabled("UserPlayEmoteByIdAnimTrackReturn2")
+end)
+local var20_upvw = ""
+local var21_upvw
+local var22_upvw
+local var23_upvw
+local var24_upvw = 1
+local tbl_upvr_2 = {}
+local tbl_upvr = {
+	idle = {{
+		id = "http://www.roblox.com/asset/?id=180435571";
+		weight = 9;
+	}};
+	walk = {{
+		id = "http://www.roblox.com/asset/?id=180426354";
+		weight = 10;
+	}};
+	run = {{
+		id = "run.xml";
+		weight = 10;
+	}};
+	jump = {{
+		id = "http://www.roblox.com/asset/?id=125750702";
+		weight = 10;
+	}};
+	fall = {{
+		id = "http://www.roblox.com/asset/?id=180436148";
+		weight = 10;
+	}};
+	climb = {{
+		id = "http://www.roblox.com/asset/?id=180436334";
+		weight = 10;
+	}};
+	sit = {{
+		id = "http://www.roblox.com/asset/?id=178130996";
+		weight = 10;
+	}};
+	toolnone = {{
+		id = "http://www.roblox.com/asset/?id=182393478";
+		weight = 10;
+	}};
+	toolslash = {{
+		id = "http://www.roblox.com/asset/?id=129967390";
+		weight = 10;
+	}};
+	toollunge = {{
+		id = "http://www.roblox.com/asset/?id=129967478";
+		weight = 10;
+	}};
+	wave = {{
+		id = "http://www.roblox.com/asset/?id=128777973";
+		weight = 10;
+	}};
+	point = {{
+		id = "http://www.roblox.com/asset/?id=128853357";
+		weight = 10;
+	}};
+	laugh = {{
+		id = "http://www.roblox.com/asset/?id=129423131";
+		weight = 10;
+	}};
+	cheer = {{
+		id = "http://www.roblox.com/asset/?id=129423030";
+		weight = 10;
+	}};
+}
+local tbl_upvr_3 = {
+	wave = false;
+	point = false;
+	dance1 = true;
+	dance2 = true;
+	dance3 = true;
+	laugh = false;
+	cheer = false;
+}
+function configureAnimationSet(arg1, arg2) -- Line 75
+	--[[ Upvalues[1]:
+		[1]: tbl_upvr_2 (readonly)
+	]]
+	if tbl_upvr_2[arg1] ~= nil then
+		for _, v in pairs(tbl_upvr_2[arg1].connections) do
+			v:disconnect()
+		end
+	end
+	tbl_upvr_2[arg1] = {}
+	tbl_upvr_2[arg1].count = 0
+	tbl_upvr_2[arg1].totalWeight = 0
+	tbl_upvr_2[arg1].connections = {}
+	local SOME = script:FindFirstChild(arg1)
+	if SOME ~= nil then
+		table.insert(tbl_upvr_2[arg1].connections, SOME.ChildAdded:connect(function(arg1_2) -- Line 90
+			--[[ Upvalues[2]:
+				[1]: arg1 (readonly)
+				[2]: arg2 (readonly)
+			]]
+			configureAnimationSet(arg1, arg2)
+		end))
+		table.insert(tbl_upvr_2[arg1].connections, SOME.ChildRemoved:connect(function(arg1_3) -- Line 91
+			--[[ Upvalues[2]:
+				[1]: arg1 (readonly)
+				[2]: arg2 (readonly)
+			]]
+			configureAnimationSet(arg1, arg2)
+		end))
+		local var68 = 1
+		for _, v_2 in pairs(SOME:GetChildren()) do
+			if v_2:IsA("Animation") then
+				table.insert(tbl_upvr_2[arg1].connections, v_2.Changed:connect(function(arg1_4) -- Line 95
+					--[[ Upvalues[2]:
+						[1]: arg1 (readonly)
+						[2]: arg2 (readonly)
+					]]
+					configureAnimationSet(arg1, arg2)
+				end))
+				tbl_upvr_2[arg1][var68] = {}
+				tbl_upvr_2[arg1][var68].anim = v_2
+				local Weight = v_2:FindFirstChild("Weight")
+				if Weight == nil then
+					tbl_upvr_2[arg1][var68].weight = 1
+				else
+					tbl_upvr_2[arg1][var68].weight = Weight.Value
+				end
+				tbl_upvr_2[arg1].count = tbl_upvr_2[arg1].count + 1
+				tbl_upvr_2[arg1].totalWeight = tbl_upvr_2[arg1].totalWeight + tbl_upvr_2[arg1][var68].weight
+			end
+		end
+	end
+	if tbl_upvr_2[arg1].count <= 0 then
+		for i_3, v_3 in pairs(arg2) do
+			v_2 = tbl_upvr_2[arg1]
+			v_2[i_3] = {}
+			v_2 = tbl_upvr_2[arg1][i_3]
+			v_2.anim = Instance.new("Animation")
+			v_2 = tbl_upvr_2[arg1][i_3].anim
+			v_2.Name = arg1
+			v_2 = tbl_upvr_2[arg1][i_3].anim
+			v_2.AnimationId = v_3.id
+			v_2 = tbl_upvr_2[arg1][i_3]
+			v_2.weight = v_3.weight
+			v_2 = tbl_upvr_2[arg1]
+			v_2.count = tbl_upvr_2[arg1].count + 1
+			v_2 = tbl_upvr_2[arg1]
+			v_2.totalWeight = tbl_upvr_2[arg1].totalWeight + v_3.weight
+		end
+	end
+end
+function scriptChildModified(arg1) -- Line 128
+	--[[ Upvalues[1]:
+		[1]: tbl_upvr (readonly)
+	]]
+	local var77 = tbl_upvr[arg1.Name]
+	if var77 ~= nil then
+		configureAnimationSet(arg1.Name, var77)
+	end
+end
+script.ChildAdded:connect(scriptChildModified)
+script.ChildRemoved:connect(scriptChildModified)
+local var78
+if Humanoid_upvr then
+	var78 = Humanoid_upvr:FindFirstChildOfClass("Animator")
+else
+	var78 = nil
+end
+if var78 then
+	for _, v_4 in ipairs(var78:GetPlayingAnimationTracks()) do
+		v_4:Stop(0)
+		v_4:Destroy()
+	end
+end
+for i_5, _ in pairs(tbl_upvr) do
+	-- KONSTANTWARNING: Failed to evaluate expression, replaced with nil [311.23]
+	configureAnimationSet(i_5, nil)
+end
+local var85_upvw = "None"
+local var86_upvw = 0
+function stopAllAnimations() -- Line 169
+	--[[ Upvalues[5]:
+		[1]: var20_upvw (read and write)
+		[2]: tbl_upvr_3 (readonly)
+		[3]: var21_upvw (read and write)
+		[4]: var23_upvw (read and write)
+		[5]: var22_upvw (read and write)
+	]]
+	local var87
+	if tbl_upvr_3[var20_upvw] ~= nil and tbl_upvr_3[var87] == false then
+		var87 = "idle"
+	end
+	var20_upvw = ""
+	var21_upvw = nil
+	if var23_upvw ~= nil then
+		var23_upvw:disconnect()
+	end
+	if var22_upvw ~= nil then
+		var22_upvw:Stop()
+		var22_upvw:Destroy()
+		var22_upvw = nil
+	end
+	return var87
+end
+function setAnimationSpeed(arg1) -- Line 191
+	--[[ Upvalues[2]:
+		[1]: var24_upvw (read and write)
+		[2]: var22_upvw (read and write)
+	]]
+	if arg1 ~= var24_upvw then
+		var24_upvw = arg1
+		var22_upvw:AdjustSpeed(var24_upvw)
+	end
+end
+function keyFrameReachedFunc(arg1) -- Line 198
+	--[[ Upvalues[4]:
+		[1]: var20_upvw (read and write)
+		[2]: tbl_upvr_3 (readonly)
+		[3]: var24_upvw (read and write)
+		[4]: Humanoid_upvr (readonly)
+	]]
+	if arg1 == "End" then
+		local var88
+		if tbl_upvr_3[var20_upvw] ~= nil and tbl_upvr_3[var88] == false then
+			var88 = "idle"
+		end
+		playAnimation(var88, 0, Humanoid_upvr)
+		setAnimationSpeed(var24_upvw)
+	end
+end
+function playAnimation(arg1, arg2, arg3) -- Line 214
+	--[[ Upvalues[6]:
+		[1]: tbl_upvr_2 (readonly)
+		[2]: var21_upvw (read and write)
+		[3]: var22_upvw (read and write)
+		[4]: var24_upvw (read and write)
+		[5]: var20_upvw (read and write)
+		[6]: var23_upvw (read and write)
+	]]
+	local var90
+	while tbl_upvr_2[arg1][var90].weight < math.random(1, tbl_upvr_2[arg1].totalWeight) do
+		var90 += 1
+	end
+	local anim = tbl_upvr_2[arg1][var90].anim
+	if anim ~= var21_upvw then
+		if var22_upvw ~= nil then
+			var22_upvw:Stop(arg2)
+			var22_upvw:Destroy()
+		end
+		var24_upvw = 1
+		var22_upvw = arg3:LoadAnimation(anim)
+		var22_upvw.Priority = Enum.AnimationPriority.Core
+		var22_upvw:Play(arg2)
+		var20_upvw = arg1
+		var21_upvw = anim
+		if var23_upvw ~= nil then
+			var23_upvw:disconnect()
+		end
+		var23_upvw = var22_upvw.KeyframeReached:connect(keyFrameReachedFunc)
+	end
+end
+local var92_upvw = ""
+local var93_upvw
+local var94_upvw
+local var95_upvw
+function toolKeyFrameReachedFunc(arg1) -- Line 263
+	--[[ Upvalues[2]:
+		[1]: var92_upvw (read and write)
+		[2]: Humanoid_upvr (readonly)
+	]]
+	if arg1 == "End" then
+		playToolAnimation(var92_upvw, 0, Humanoid_upvr)
+	end
+end
+function playToolAnimation(arg1, arg2, arg3, arg4) -- Line 271
+	--[[ Upvalues[5]:
+		[1]: tbl_upvr_2 (readonly)
+		[2]: var94_upvw (read and write)
+		[3]: var93_upvw (read and write)
+		[4]: var92_upvw (read and write)
+		[5]: var95_upvw (read and write)
+	]]
+	local var97
+	while tbl_upvr_2[arg1][var97].weight < math.random(1, tbl_upvr_2[arg1].totalWeight) do
+		var97 += 1
+	end
+	local var98
+	local anim_2 = tbl_upvr_2[arg1][var97].anim
+	if var94_upvw ~= anim_2 then
+		if var93_upvw ~= nil then
+			var93_upvw:Stop()
+			var93_upvw:Destroy()
+			var98 = 0
+		end
+		var93_upvw = arg3:LoadAnimation(anim_2)
+		if arg4 then
+			var93_upvw.Priority = arg4
+		end
+		var93_upvw:Play(var98)
+		var92_upvw = arg1
+		var94_upvw = anim_2
+		var95_upvw = var93_upvw.KeyframeReached:connect(toolKeyFrameReachedFunc)
+	end
+end
+function stopToolAnimations() -- Line 306
+	--[[ Upvalues[4]:
+		[1]: var92_upvw (read and write)
+		[2]: var95_upvw (read and write)
+		[3]: var94_upvw (read and write)
+		[4]: var93_upvw (read and write)
+	]]
+	if var95_upvw ~= nil then
+		var95_upvw:disconnect()
+	end
+	var92_upvw = ""
+	var94_upvw = nil
+	if var93_upvw ~= nil then
+		var93_upvw:Stop()
+		var93_upvw:Destroy()
+		var93_upvw = nil
+	end
+	return var92_upvw
+end
+function onRunning(arg1) -- Line 329
+	--[[ Upvalues[5]:
+		[1]: Humanoid_upvr (readonly)
+		[2]: var21_upvw (read and write)
+		[3]: var16_upvw (read and write)
+		[4]: tbl_upvr_3 (readonly)
+		[5]: var20_upvw (read and write)
+	]]
+	if 0.01 < arg1 then
+		playAnimation("walk", 0.1, Humanoid_upvr)
+		if var21_upvw and var21_upvw.AnimationId == "rbxassetid://13601608318" then
+			setAnimationSpeed(arg1 / 16)
+		end
+		var16_upvw = "Running"
+	elseif tbl_upvr_3[var20_upvw] == nil then
+		playAnimation("idle", 0.1, Humanoid_upvr)
+		var16_upvw = "Standing"
+	end
+end
+function onDied() -- Line 344
+	--[[ Upvalues[1]:
+		[1]: var16_upvw (read and write)
+	]]
+	var16_upvw = "Dead"
+end
+function onJumping() -- Line 348
+	--[[ Upvalues[3]:
+		[1]: Humanoid_upvr (readonly)
+		[2]: var86_upvw (read and write)
+		[3]: var16_upvw (read and write)
+	]]
+	playAnimation("jump", 0.1, Humanoid_upvr)
+	var86_upvw = 0.3
+	var16_upvw = "Jumping"
+end
+function onClimbing(arg1) -- Line 354
+	--[[ Upvalues[2]:
+		[1]: Humanoid_upvr (readonly)
+		[2]: var16_upvw (read and write)
+	]]
+	playAnimation("climb", 0.1, Humanoid_upvr)
+	setAnimationSpeed(arg1 / 12)
+	var16_upvw = "Climbing"
+end
+function onGettingUp() -- Line 360
+	--[[ Upvalues[1]:
+		[1]: var16_upvw (read and write)
+	]]
+	var16_upvw = "GettingUp"
+end
+function onFreeFall() -- Line 364
+	--[[ Upvalues[3]:
+		[1]: var86_upvw (read and write)
+		[2]: Humanoid_upvr (readonly)
+		[3]: var16_upvw (read and write)
+	]]
+	if var86_upvw <= 0 then
+		playAnimation("fall", 0.3, Humanoid_upvr)
+	end
+	var16_upvw = "FreeFall"
+end
+function onFallingDown() -- Line 371
+	--[[ Upvalues[1]:
+		[1]: var16_upvw (read and write)
+	]]
+	var16_upvw = "FallingDown"
+end
+function onSeated() -- Line 375
+	--[[ Upvalues[1]:
+		[1]: var16_upvw (read and write)
+	]]
+	var16_upvw = "Seated"
+end
+function onPlatformStanding() -- Line 379
+	--[[ Upvalues[1]:
+		[1]: var16_upvw (read and write)
+	]]
+	var16_upvw = "PlatformStanding"
+end
+function onSwimming(arg1) -- Line 383
+	--[[ Upvalues[1]:
+		[1]: var16_upvw (read and write)
+	]]
+	if 0 < arg1 then
+		var16_upvw = "Running"
+	else
+		var16_upvw = "Standing"
+	end
+end
+function getTool() -- Line 391
+	--[[ Upvalues[1]:
+		[1]: Parent_upvr (readonly)
+	]]
+	for _, v_6 in ipairs(Parent_upvr:GetChildren()) do
+		if v_6.className == "Tool" then
+			return v_6
+		end
+	end
+	return nil
+end
+function getToolAnim(arg1) -- Line 398
+	for _, v_7 in ipairs(arg1:GetChildren()) do
+		if v_7.Name == "toolanim" and v_7.className == "StringValue" then
+			return v_7
+		end
+	end
+	return nil
+end
+function animateTool() -- Line 407
+	--[[ Upvalues[2]:
+		[1]: var85_upvw (read and write)
+		[2]: Humanoid_upvr (readonly)
+	]]
+	if var85_upvw == "None" then
+		playToolAnimation("toolnone", 0.1, Humanoid_upvr, Enum.AnimationPriority.Idle)
+	else
+		if var85_upvw == "Slash" then
+			playToolAnimation("toolslash", 0, Humanoid_upvr, Enum.AnimationPriority.Action)
+			return
+		end
+		if var85_upvw == "Lunge" then
+			playToolAnimation("toollunge", 0, Humanoid_upvr, Enum.AnimationPriority.Action)
+			return
+		end
+	end
+end
+function moveSit() -- Line 425
+	--[[ Upvalues[4]:
+		[1]: Right_Shoulder_upvr (readonly)
+		[2]: Left_Shoulder_upvr (readonly)
+		[3]: Right_Hip_upvr (readonly)
+		[4]: Left_Hip_upvr (readonly)
+	]]
+	Right_Shoulder_upvr.MaxVelocity = 0.15
+	Left_Shoulder_upvr.MaxVelocity = 0.15
+	Right_Shoulder_upvr:SetDesiredAngle(1.57)
+	Left_Shoulder_upvr:SetDesiredAngle(-1.57)
+	Right_Hip_upvr:SetDesiredAngle(1.57)
+	Left_Hip_upvr:SetDesiredAngle(-1.57)
+end
+local var110_upvw = 0
+local var111_upvw = 0
+function move(arg1) -- Line 436
+	--[[ Upvalues[11]:
+		[1]: var110_upvw (read and write)
+		[2]: var86_upvw (read and write)
+		[3]: var16_upvw (read and write)
+		[4]: Humanoid_upvr (readonly)
+		[5]: Right_Shoulder_upvr (readonly)
+		[6]: Left_Shoulder_upvr (readonly)
+		[7]: Right_Hip_upvr (readonly)
+		[8]: Left_Hip_upvr (readonly)
+		[9]: var85_upvw (read and write)
+		[10]: var111_upvw (read and write)
+		[11]: var94_upvw (read and write)
+	]]
+	-- KONSTANTWARNING: Variable analysis failed. Output will have some incorrect variable assignments
+	var110_upvw = arg1
+	if 0 < var86_upvw then
+		var86_upvw -= arg1 - var110_upvw
+	end
+	local var112
+	if var16_upvw == "FreeFall" and var86_upvw <= 0 then
+		playAnimation("fall", 0.3, Humanoid_upvr)
+	else
+		if var16_upvw == "Seated" then
+			playAnimation("sit", 0.5, Humanoid_upvr)
+			return
+		end
+		if var16_upvw == "Running" then
+			playAnimation("walk", 0.1, Humanoid_upvr)
+		elseif var16_upvw == "Dead" or var16_upvw == "GettingUp" or var16_upvw == "FallingDown" or var16_upvw == "Seated" or var16_upvw == "PlatformStanding" then
+			stopAllAnimations()
+			var112 = true
+		end
+	end
+	if var112 then
+		local var113 = 0.1 * math.sin(arg1 * 1)
+		Right_Shoulder_upvr:SetDesiredAngle(var113 + 0)
+		Left_Shoulder_upvr:SetDesiredAngle(var113 - 0)
+		Right_Hip_upvr:SetDesiredAngle(-var113)
+		Left_Hip_upvr:SetDesiredAngle(-var113)
+	end
+	local getTool_result1 = getTool()
+	if getTool_result1 and getTool_result1:FindFirstChild("Handle") then
+		local getToolAnim_result1 = getToolAnim(getTool_result1)
+		if getToolAnim_result1 then
+			var85_upvw = getToolAnim_result1.Value
+			getToolAnim_result1.Parent = nil
+			var111_upvw = arg1 + 0.3
+		end
+		if var111_upvw < arg1 then
+			var111_upvw = 0
+			var85_upvw = "None"
+		end
+		animateTool()
+	else
+		stopToolAnimations()
+		var85_upvw = "None"
+		var94_upvw = nil
+		var111_upvw = 0
+	end
+end
+Humanoid_upvr.Died:connect(onDied)
+Humanoid_upvr.Running:connect(onRunning)
+Humanoid_upvr.Jumping:connect(onJumping)
+Humanoid_upvr.Climbing:connect(onClimbing)
+Humanoid_upvr.GettingUp:connect(onGettingUp)
+Humanoid_upvr.FreeFalling:connect(onFreeFall)
+Humanoid_upvr.FallingDown:connect(onFallingDown)
+Humanoid_upvr.Seated:connect(onSeated)
+Humanoid_upvr.PlatformStanding:connect(onPlatformStanding)
+Humanoid_upvr.Swimming:connect(onSwimming)
+playAnimation("idle", 0.1, Humanoid_upvr)
+var16_upvw = "Standing"
+while Parent_upvr.Parent ~= nil do
+	local _, wait_result2 = wait(0.1)
+	move(wait_result2)
+end
