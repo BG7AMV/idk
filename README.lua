@@ -1391,15 +1391,6 @@ RunService.RenderStepped:Connect(function()
         lbl.Text = tostring(d).."m"..hp
         lbl.TextSize = math.clamp(16 + (d / 75) * 10, 16, 28)
     end
-end) Copilot said: Roblox oyununda elindeki yeni dosyalar ve sistemler
-Roblox oyununda elindeki yeni dosyalar ve sistemler ile, client tarafında (yani oyuncu bilgisayarında) çok geniş kapsamlı ve ileri seviye müdahaleler/hileler/özelleştirmeler yapabilirsin. Her modülün ve fonksiyonun mantığını, olanaklarını ve bunların nasıl exploit edilebileceğini adım adım anlatıyorum:
-
-1. Effect Sistemi (EffectReplicator/EffectManager) ile Manipülasyon
-Yapabileceklerin:
-Tüm olumsuz efektleri (Stun, FullStun, Cooldown, VelocityNerf, Blocking, Dashed, NoJump vs) doğrudan yok edebilirsin.
-Kendine özel, oyunda olmayan efektler ekleyebilirsin (ör: Sürekli Speed, NoCooldown gibi).
-Efektlerin hangi durumda tetikleneceğini, süresini, değerini, tag’larını anlık değiştirebilirsin.
-Efekt event’lerine (EffectAdded, EffectRemoving vb.) hook atıp, yeni efekt eklenince anında silebilirsin (otomatik anti-stun, anti-block vs).
 end)
 
 -- ====================
